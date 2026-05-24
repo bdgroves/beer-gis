@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Quality — Beer & GIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1814;--paper:#f5f1e8;--rust:#8b3a1f;--gold:#b8860b;--slate:#3d4a5c;--muted:#7a7060;--rule:#d4c9b0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);}
+  nav{border-bottom:1px solid var(--rule);padding:.85rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  nav a{color:var(--rust);text-decoration:none;}
+  .hero{border-bottom:1px solid var(--rule);padding:3rem 2rem 2.5rem;background:linear-gradient(180deg,#ede8db 0%,var(--paper) 100%);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--rust);margin-bottom:.75rem;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.75rem;}
+  .hero-sub{font-size:1rem;color:var(--muted);max-width:600px;line-height:1.7;font-weight:300;}
+  .container{max-width:820px;margin:0 auto;padding:3rem 2rem;}
+  .concept{margin-bottom:3.5rem;border-left:4px solid var(--rust);padding-left:1.5rem;}
+  .concept-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rust);margin-bottom:.4rem;}
+  .concept h2{font-family:'Playfair Display',serif;font-size:1.75rem;margin-bottom:.75rem;}
+  .concept p{font-size:14.5px;line-height:1.75;color:var(--ink);margin-bottom:.85rem;font-weight:300;}
+  .beer-callout{background:#fff8e8;border:1px solid #e8d890;border-left:4px solid var(--gold);padding:1rem 1.25rem;margin:1rem 0;border-radius:0 6px 6px 0;font-size:14px;line-height:1.65;}
+  .beer-callout-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:4px;}
+  .exam-tip{background:#fdf0e4;border-left:4px solid var(--rust);padding:.85rem 1.1rem;margin:1rem 0;font-size:13.5px;line-height:1.65;border-radius:0 4px 4px 0;}
+  .exam-tip-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rust);margin-bottom:4px;}
+  .two-question{background:white;border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin:1.5rem 0;}
+  .two-question h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;}
+  .q-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:.75rem;font-size:14px;line-height:1.6;}
+  .q-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--rust);flex-shrink:0;width:20px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:1rem 0;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--rule);text-align:left;background:#faf8f3;}
+  td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:#faf8f3;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--slate);font-weight:500;}
+  .page-nav{display:flex;justify-content:space-between;padding-top:2rem;border-top:1px solid var(--rule);margin-top:2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .page-nav a{color:var(--rust);text-decoration:none;}
+  footer{border-top:1px solid var(--rule);padding:1.25rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+  footer a{color:var(--rust);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">← Beer &amp; GIS</a> &nbsp;/&nbsp; GIS Concepts &nbsp;/&nbsp; Data Quality</nav>
+
+<div class="hero">
+  <div class="eyebrow">📏 Data Quality · GIS Concepts</div>
+  <h1>Data Quality</h1>
+  <p class="hero-sub">ISO 19157 quality elements — diagnosing errors in a Pacific Northwest brewery dataset. Four types, four beer scenarios.</p>
+</div>
+
+<div class="container">
+
+  <!-- POSITIONAL -->
+  <div class="concept">
+    <div class="concept-tag">Element 01</div>
+    <h2>Positional Accuracy</h2>
+    <p>Positional accuracy describes how closely the recorded coordinates match the true real-world location. The feature exists, it's real — it's just in the wrong place on the map.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Dataset Example</div>
+      Fremont Brewing on N 34th St in Seattle is mapped two blocks east of its actual location. The brewery is real, the data is otherwise complete — but the coordinates are wrong. A delivery driver using this map would show up at the wrong address.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Causes</div>
+      GPS multipath error · poor satellite geometry · digitizing from low-resolution imagery · datum mismatch (NAD 27 vs NAD 83 without transformation)
+    </div>
+  </div>
+
+  <!-- LOGICAL -->
+  <div class="concept">
+    <div class="concept-tag">Element 02</div>
+    <h2>Logical Consistency</h2>
+    <p>Logical consistency describes whether features are internally consistent with each other and with real-world rules. The individual features may be in the correct locations — but together they create an impossible or contradictory situation.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Dataset Example</div>
+      Reuben's Brews in the Roosevelt neighborhood is plotted inside the Green Lake polygon. A brewery cannot physically exist inside a lake. The brewery location and the lake polygon contradict each other — a logical inconsistency. Also: a parcel coded as both "commercial" and "residential" simultaneously, or a taproom whose boundary overlaps the adjacent building footprint.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Road through a lake" · "Building inside a river" · "Bridge below the river it crosses" · "Coded as both X and Y" · "Overlapping parcels" → <strong>Logical inconsistency</strong>
+    </div>
+  </div>
+
+  <!-- ATTRIBUTE -->
+  <div class="concept">
+    <div class="concept-tag">Element 03</div>
+    <h2>Attribute Accuracy</h2>
+    <p>Attribute accuracy describes whether the values in the attribute table correctly represent the real-world characteristics of each feature. The location is right — the data about the feature is wrong.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Dataset Example</div>
+      Elysian Brewing on Capitol Hill is correctly located on the map but its TYPE field reads "Winery" instead of "Brewery." The coordinates are accurate — the attribute value is wrong. A query for "all breweries" would miss Elysian entirely.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Classified as wrong type" · "Wrong attribute value" · "Mislabeled" · "Coded incorrectly" — but the feature is in the right location → <strong>Attribute accuracy</strong>
+    </div>
+  </div>
+
+  <!-- TEMPORAL -->
+  <div class="concept">
+    <div class="concept-tag">Element 04</div>
+    <h2>Temporal Accuracy</h2>
+    <p>Temporal accuracy describes whether the data reflects the correct time period. The feature may have been accurately mapped at some point — but reality has changed and the data hasn't kept up.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Dataset Example</div>
+      The dataset still shows the Elysian Brewing Capitol Hill taproom even though it closed in 2019. The location was accurate when collected — but the taproom no longer exists. A beer tourist using this map would find an empty storefront. Also: a brewery that rebranded two years ago still appears under its old name.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "No longer exists" · "Closed/demolished but still shown" · "Old dataset used for current study" · "Hasn't been updated to reflect recent changes" → <strong>Temporal accuracy</strong>
+    </div>
+  </div>
+
+  <!-- TWO QUESTION TEST -->
+  <div class="two-question">
+    <h3>🍺 The Two-Question Test</h3>
+    <div class="q-row"><div class="q-num">1.</div><div>Is the brewery in the <strong>wrong location</strong>? → <strong>Positional accuracy</strong></div></div>
+    <div class="q-row"><div class="q-num">2.</div><div>Does the brewery <strong>contradict another feature</strong> or violate a real-world rule (inside a lake, inside a building)? → <strong>Logical consistency</strong></div></div>
+    <div class="q-row"><div class="q-num">3.</div><div>Is the brewery's <strong>attribute value wrong</strong> (classified as winery, wrong name, wrong hours)? → <strong>Attribute accuracy</strong></div></div>
+    <div class="q-row"><div class="q-num">4.</div><div>Is the brewery <strong>no longer open but still shown</strong>, or is the data from the wrong time period? → <strong>Temporal accuracy</strong></div></div>
+  </div>
+
+  <!-- INTENTIONAL VS UNINTENTIONAL -->
+  <div style="margin-bottom:2.5rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule);">Intentional vs Unintentional Error</div>
+    <table>
+      <thead><tr><th>Type</th><th>Examples</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Intentional</td><td>Generalization · map projection distortion</td><td>Cartographer chose to accept — documented in metadata</td></tr>
+        <tr><td class="mono">Unintentional</td><td>GPS error · digitizing mistakes · scanner distortion</td><td>Happened despite best efforts — should be corrected</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="classification.html">← Classification Methods</a>
+    <a href="visual-variables.html">Visual Variables →</a>
+  </div>
+</div>
+
+<footer>
+  <span><a href="../index.html">Beer &amp; GIS</a> · Brooks Groves</span>
+  <span><a href="https://brooksgroves.com">brooksgroves.com</a></span>
+</footer>
+</body>
+</html>

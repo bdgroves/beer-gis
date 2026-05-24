@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beer & GIS — Brooks Groves</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1814;
+    --paper: #f5f1e8;
+    --rust: #8b3a1f;
+    --gold: #b8860b;
+    --slate: #3d4a5c;
+    --muted: #7a7060;
+    --rule: #d4c9b0;
+    --amber: #c8860a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Hero */
+  .hero {
+    border-bottom: 1px solid var(--rule);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    background: linear-gradient(180deg, #ede8db 0%, var(--paper) 100%);
+  }
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .hero-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .hero-meta a { color: var(--rust); text-decoration: none; }
+  .hero-meta a:hover { text-decoration: underline; }
+
+  /* Main content */
+  .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+
+  /* Section headers */
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Project cards */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 3rem; }
+  .card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .card-header {
+    padding: 1.25rem 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-icon {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .card-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+  }
+  .card-body { padding: 0.85rem 1.25rem 1.25rem; }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 0.4rem;
+    color: var(--ink);
+  }
+  .card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+  .card-footer {
+    padding: 0.65rem 1.25rem;
+    background: #faf8f3;
+    border-top: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+  .card-status { color: var(--rust); }
+
+  /* Featured project */
+  .featured {
+    background: white;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--rust);
+    border-radius: 0 8px 8px 0;
+    padding: 1.75rem;
+    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .featured-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--rust);
+    margin-bottom: 0.5rem;
+  }
+  .featured h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.6rem;
+  }
+  .featured p { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 1rem; }
+  .featured-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    color: var(--slate);
+    background: var(--paper);
+  }
+  .btn {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 8px 16px;
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    text-decoration: none;
+    border-radius: 4px;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--rust); color: white; }
+
+  /* About strip */
+  .about {
+    border-top: 1px solid var(--rule);
+    padding-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .about h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .about a { color: var(--rust); text-decoration: none; }
+  .about a:hover { text-decoration: underline; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  footer a { color: var(--rust); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .featured { grid-template-columns: 1fr; }
+    .about { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Brooks Groves · GIS Projects</div>
+  <h1>Beer &amp; <em>Maps</em></h1>
+  <p class="hero-sub">Geospatial analysis through the lens of craft beer — exploring GIS concepts, spatial methods, and the Pacific Northwest brewing landscape.</p>
+  <div class="hero-meta">
+    <a href="https://brooksgroves.com">brooksgroves.com</a> &nbsp;·&nbsp; GIS Analyst &amp; Data Scientist &nbsp;·&nbsp; Lakewood, WA
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Featured -->
+  <div class="section-label">Featured Project</div>
+  <div class="featured">
+    <div>
+      <div class="featured-label">🍺 Full Analysis</div>
+      <h2>Pacific Northwest Brewery Atlas</h2>
+      <p>A full geospatial analysis of the Pacific Northwest craft brewing landscape — spatial distribution, clustering analysis, proximity to hop-growing regions, drive-time catchment areas, and more. Built with real data, real methods.</p>
+      <div class="featured-tags">
+        <span class="tag">Kernel Density</span>
+        <span class="tag">Drive-time Analysis</span>
+        <span class="tag">Spatial Join</span>
+        <span class="tag">Choropleth</span>
+        <span class="tag">Clustering</span>
+        <span class="tag">Python</span>
+      </div>
+    </div>
+    <a href="brewery-analysis/index.html" class="btn">View Project →</a>
+  </div>
+
+  <!-- GISP Concept Cards -->
+  <div class="section-label">GIS Concepts — Explained with Beer</div>
+  <div class="card-grid">
+
+    <a href="gisp-concepts/raster-ops.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">🗃️</div>
+        <div class="card-tag">Raster Analysis</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Raster Operations</div>
+        <div class="card-desc">Local, Focal, Zonal, and Global operations — illustrated through hop yard suitability analysis and brewery heat maps.</div>
+      </div>
+      <div class="card-footer">
+        <span>Local · Focal · Zonal · Global</span>
+        <span class="card-status">Live ✓</span>
+      </div>
+    </a>
+
+    <a href="gisp-concepts/overlay-ops.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">🔀</div>
+        <div class="card-tag">Vector Analysis</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Overlay Operations</div>
+        <div class="card-desc">Union, Intersect, Clip, and Erase — finding the perfect taproom site using zoning, school buffers, and neighborhood boundaries.</div>
+      </div>
+      <div class="card-footer">
+        <span>Union · Intersect · Clip · Erase</span>
+        <span class="card-status">Live ✓</span>
+      </div>
+    </a>
+
+    <a href="gisp-concepts/classification.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div class="card-tag">Cartography</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Classification Methods</div>
+        <div class="card-desc">Natural Breaks, Quantile, Equal Interval, and Standard Deviation — mapping brewery ratings across Washington State.</div>
+      </div>
+      <div class="card-footer">
+        <span>Jenks · Quantile · Std Dev</span>
+        <span class="card-status">Live ✓</span>
+      </div>
+    </a>
+
+    <a href="gisp-concepts/data-quality.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">📏</div>
+        <div class="card-tag">Data Quality</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Data Quality</div>
+        <div class="card-desc">Positional, logical, attribute, and temporal accuracy — diagnosing errors in a Pacific Northwest brewery dataset.</div>
+      </div>
+      <div class="card-footer">
+        <span>ISO 19157 Quality Elements</span>
+        <span class="card-status">Live ✓</span>
+      </div>
+    </a>
+
+    <a href="gisp-concepts/visual-variables.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">🎨</div>
+        <div class="card-tag">Cartographic Design</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Bertin's Visual Variables</div>
+        <div class="card-desc">Value, Hue, Size, Shape, Texture, and Orientation — building a beer tourism map of the Pacific Northwest.</div>
+      </div>
+      <div class="card-footer">
+        <span>Bertin's Semiology of Graphics</span>
+        <span class="card-status">Live ✓</span>
+      </div>
+    </a>
+
+    <a href="gisp-concepts/projections.html" class="card">
+      <div class="card-header">
+        <div class="card-icon">🌐</div>
+        <div class="card-tag">Coordinate Systems</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Projections &amp; Datums</div>
+        <div class="card-desc">Choosing the right coordinate system for hop yard surveys, regional brewery maps, and national distribution analysis.</div>
+      </div>
+      <div class="card-footer">
+        <span>State Plane · UTM · Albers</span>
+        <span class="card-status">Coming soon</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- About -->
+  <div class="about">
+    <div>
+      <h3>About this project</h3>
+      Built as a study companion for the GISP certification exam — GIS concepts explained through craft beer scenarios from the Pacific Northwest. Every method and principle here maps directly to real exam content.
+    </div>
+    <div>
+      <h3>Data sources</h3>
+      Brewery data from OpenStreetMap and the Brewers Association. Hop growing region data from USDA. Washington State administrative boundaries from the Census Bureau. All analysis performed in Python with GeoPandas and Folium.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Brooks Groves · <a href="https://brooksgroves.com">brooksgroves.com</a></span>
+  <span>GIS Analyst · Data Scientist · Lakewood, WA</span>
+</footer>
+
+</body>
+</html>

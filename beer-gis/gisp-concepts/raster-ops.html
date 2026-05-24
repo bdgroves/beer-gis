@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raster Operations — Beer & GIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1814;
+    --paper: #f5f1e8;
+    --rust: #8b3a1f;
+    --gold: #b8860b;
+    --slate: #3d4a5c;
+    --muted: #7a7060;
+    --rule: #d4c9b0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); color: var(--ink); }
+
+  nav {
+    border-bottom: 1px solid var(--rule);
+    padding: 0.85rem 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  nav a { color: var(--rust); text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+
+  .hero {
+    border-bottom: 1px solid var(--rule);
+    padding: 3rem 2rem 2.5rem;
+    background: linear-gradient(180deg, #ede8db 0%, var(--paper) 100%);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--rust);
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 0.75rem; }
+  .hero-sub { font-size: 1rem; color: var(--muted); max-width: 600px; line-height: 1.7; font-weight: 300; }
+
+  .container { max-width: 820px; margin: 0 auto; padding: 3rem 2rem; }
+
+  /* Concept sections */
+  .concept {
+    margin-bottom: 3.5rem;
+    border-left: 4px solid var(--rust);
+    padding-left: 1.5rem;
+  }
+  .concept-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--rust);
+    margin-bottom: 0.4rem;
+  }
+  .concept h2 { font-family: 'Playfair Display', serif; font-size: 1.75rem; margin-bottom: 0.75rem; }
+  .concept p { font-size: 14.5px; line-height: 1.75; color: var(--ink); margin-bottom: 0.85rem; font-weight: 300; }
+
+  /* Beer callout */
+  .beer-callout {
+    background: #fff8e8;
+    border: 1px solid #e8d890;
+    border-left: 4px solid var(--gold);
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .beer-callout-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  /* Grid visual */
+  .grid-demo {
+    display: grid;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  .grid-demo-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-demo-2 { grid-template-columns: 1fr 1fr; }
+  .grid-card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+  .grid-card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--slate);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .grid-card p { font-size: 13px; line-height: 1.55; color: var(--muted); }
+
+  /* Raster visual */
+  .raster-wrap { margin: 1.25rem 0; overflow-x: auto; }
+  .raster-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .raster-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .raster-grid { display: grid; grid-template-columns: repeat(4, 36px); gap: 2px; }
+  .raster-cell {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    border-radius: 3px;
+  }
+  .raster-op { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--muted); padding: 0 4px; }
+
+  /* Exam tip */
+  .exam-tip {
+    background: #fdf0e4;
+    border-left: 4px solid var(--rust);
+    padding: 0.85rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+    border-radius: 0 4px 4px 0;
+  }
+  .exam-tip-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    margin-bottom: 4px;
+  }
+
+  /* Quick ref table */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 1rem 0; }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 7px 10px; border-bottom: 1px solid var(--rule); text-align: left; background: #faf8f3; }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #faf8f3; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--slate); font-weight: 500; }
+
+  /* Nav footer */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+  .page-nav a { color: var(--rust); text-decoration: none; }
+  .page-nav a:hover { text-decoration: underline; }
+
+  footer { border-top: 1px solid var(--rule); padding: 1.25rem 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  footer a { color: var(--rust); text-decoration: none; }
+
+  @media (max-width: 560px) { .grid-demo-3 { grid-template-columns: 1fr; } .grid-demo-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html">← Beer &amp; GIS</a> &nbsp;/&nbsp; GIS Concepts &nbsp;/&nbsp; Raster Operations
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">🗃️ Raster Analysis · GIS Concepts</div>
+  <h1>Raster Operations</h1>
+  <p class="hero-sub">Local, Focal, Zonal, and Global — four operation types that cover almost everything you'll do with raster data. Explained through hop yard analysis and brewery mapping.</p>
+</div>
+
+<div class="container">
+
+  <!-- LOCAL -->
+  <div class="concept">
+    <div class="concept-tag">Operation 01</div>
+    <h2>Local Operations</h2>
+    <p>A local operation calculates each output cell using only the corresponding cell(s) in one or more input rasters. No neighbors, no zones, no whole-raster awareness — just cell-to-cell math at matching positions.</p>
+    <p>Think of it as a spreadsheet formula applied to every cell simultaneously. If you multiply cell (3,4) in raster A by cell (3,4) in raster B, that's local. Every cell is calculated independently from its matching position.</p>
+
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Hop Yard Example</div>
+      You have two rasters covering your hop yard — <strong>soil nitrogen levels</strong> and <strong>moisture content</strong>. You multiply them together to produce a <strong>hop growth potential surface</strong>. Each cell's output uses only the nitrogen value and moisture value at that same location. No neighbors involved — just cell × cell.
+    </div>
+
+    <div class="raster-wrap">
+      <div class="raster-label">Nitrogen raster × Moisture raster = Growth potential (local operation)</div>
+      <div class="raster-row">
+        <div>
+          <div class="raster-label">Nitrogen</div>
+          <div class="raster-grid">
+            <div class="raster-cell" style="background:#e8f4d0;">3</div><div class="raster-cell" style="background:#c8e8a0;">5</div><div class="raster-cell" style="background:#a8d870;">7</div><div class="raster-cell" style="background:#88c840;">9</div>
+            <div class="raster-cell" style="background:#c8e8a0;">5</div><div class="raster-cell" style="background:#a8d870;">7</div><div class="raster-cell" style="background:#88c840;">9</div><div class="raster-cell" style="background:#68b810;">11</div>
+            <div class="raster-cell" style="background:#e8f4d0;">3</div><div class="raster-cell" style="background:#c8e8a0;">5</div><div class="raster-cell" style="background:#a8d870;">7</div><div class="raster-cell" style="background:#88c840;">9</div>
+            <div class="raster-cell" style="background:#a8d870;">7</div><div class="raster-cell" style="background:#88c840;">9</div><div class="raster-cell" style="background:#68b810;">11</div><div class="raster-cell" style="background:#88c840;">9</div>
+          </div>
+        </div>
+        <div class="raster-op">×</div>
+        <div>
+          <div class="raster-label">Moisture</div>
+          <div class="raster-grid">
+            <div class="raster-cell" style="background:#d0e8f8;">2</div><div class="raster-cell" style="background:#a0c8f0;">4</div><div class="raster-cell" style="background:#70a8e8;">6</div><div class="raster-cell" style="background:#a0c8f0;">4</div>
+            <div class="raster-cell" style="background:#a0c8f0;">4</div><div class="raster-cell" style="background:#70a8e8;">6</div><div class="raster-cell" style="background:#4088d0;">8</div><div class="raster-cell" style="background:#70a8e8;">6</div>
+            <div class="raster-cell" style="background:#d0e8f8;">2</div><div class="raster-cell" style="background:#a0c8f0;">4</div><div class="raster-cell" style="background:#70a8e8;">6</div><div class="raster-cell" style="background:#4088d0;">8</div>
+            <div class="raster-cell" style="background:#a0c8f0;">4</div><div class="raster-cell" style="background:#70a8e8;">6</div><div class="raster-cell" style="background:#70a8e8;">6</div><div class="raster-cell" style="background:#4088d0;">8</div>
+          </div>
+        </div>
+        <div class="raster-op">=</div>
+        <div>
+          <div class="raster-label">Growth Potential</div>
+          <div class="raster-grid">
+            <div class="raster-cell" style="background:#f0e8d0;">6</div><div class="raster-cell" style="background:#e0c890;">20</div><div class="raster-cell" style="background:#c89840;">42</div><div class="raster-cell" style="background:#e0c890;">36</div>
+            <div class="raster-cell" style="background:#e0c890;">20</div><div class="raster-cell" style="background:#c89840;">42</div><div class="raster-cell" style="background:#a87010;">72</div><div class="raster-cell" style="background:#c89840;">66</div>
+            <div class="raster-cell" style="background:#f0e8d0;">6</div><div class="raster-cell" style="background:#e0c890;">20</div><div class="raster-cell" style="background:#c89840;">42</div><div class="raster-cell" style="background:#a87010;">72</div>
+            <div class="raster-cell" style="background:#c89840;">28</div><div class="raster-cell" style="background:#a87010;">54</div><div class="raster-cell" style="background:#a87010;">66</div><div class="raster-cell" style="background:#a87010;">72</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Multiply raster A by raster B" · "Add two rasters" · "Subtract" · "Reclassify values" · "Change detection (raster A minus raster B)" → all <strong>Local</strong>. No neighbors, no zones = Local.
+    </div>
+  </div>
+
+  <!-- FOCAL -->
+  <div class="concept">
+    <div class="concept-tag">Operation 02</div>
+    <h2>Focal Operations</h2>
+    <p>A focal operation calculates each output cell using a neighborhood of surrounding cells — a moving window that sweeps across the raster. The output at each cell depends on what's around it, not just the cell itself.</p>
+    <p>Common window sizes are 3×3 (the cell plus its 8 neighbors) or 5×5 (the cell plus its 24 neighbors). Slope and aspect calculation from a DEM are classic focal operations because they need to know the elevation of surrounding cells to calculate the rate of change.</p>
+
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Hop Yard Example</div>
+      Your hop yard elevation raster has noisy measurements from the survey. You apply a <strong>3×3 smoothing filter</strong> — replacing each cell with the average of itself and its 8 surrounding neighbors. The resulting surface is smoother, making it easier to plan irrigation channels along gentle slopes. Each output cell looks at its neighborhood.
+    </div>
+
+    <div class="grid-demo grid-demo-2">
+      <div class="grid-card">
+        <div class="grid-card-title">Focal examples</div>
+        <p>• Slope calculation from DEM<br>• Aspect (slope direction)<br>• 3×3 or 5×5 smoothing filter<br>• Majority filter (most common value in neighborhood)<br>• Any operation with a window size</p>
+      </div>
+      <div class="grid-card">
+        <div class="grid-card-title">The 3×3 window</div>
+        <p>Each center cell's output is calculated from itself + 8 surrounding cells. The window moves across the entire raster, one cell at a time. Output at edges may be NoData where the window extends beyond the raster boundary.</p>
+      </div>
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Surrounding cells" · "Neighboring cells" · "Moving window" · "3×3 filter" · "Slope from DEM" · "Aspect" · "Smoothing filter" → all <strong>Focal</strong>. If neighbors are involved = Focal.
+    </div>
+  </div>
+
+  <!-- ZONAL -->
+  <div class="concept">
+    <div class="concept-tag">Operation 03</div>
+    <h2>Zonal Operations</h2>
+    <p>A zonal operation calculates statistics for groups of cells that share the same zone value. The zones are defined by a second raster or a polygon layer — and the statistic (mean, max, sum, min) is calculated for all cells within each zone.</p>
+    <p>The output is one value per zone — not one value per cell. This is the operation for questions like "what is the average elevation within each watershed?" or "what is the maximum temperature in each climate zone?"</p>
+
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Hop Yard Example</div>
+      Your hop yard has four varieties planted in different zones — Cascade, Centennial, Citra, and Mosaic. You want to know the <strong>average soil moisture within each hop variety zone</strong>. The hop variety polygons define the zones. The moisture raster provides the values. Zonal statistics returns one average per variety zone.
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Per polygon" · "Per watershed" · "Within each county" · "Per climate zone" · "Per school district" → all <strong>Zonal</strong>. The phrase "within each ___" where the blank is a zone or polygon = Zonal every time.
+    </div>
+  </div>
+
+  <!-- GLOBAL -->
+  <div class="concept">
+    <div class="concept-tag">Operation 04</div>
+    <h2>Global Operations</h2>
+    <p>A global operation uses all cells in the entire raster to calculate each output cell. Every cell in the dataset participates in every calculation. These operations have whole-raster awareness.</p>
+    <p>The most common global operation is Euclidean distance — how far is each cell from the nearest feature? To answer this, the algorithm must consider the entire raster to find the nearest feature for every single cell.</p>
+
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Example</div>
+      You want to know how far each point in Washington State is from the nearest craft brewery. The Euclidean distance tool calculates the distance from every single cell to the nearest brewery point — scanning the entire raster for each cell. That whole-raster awareness = <strong>Global</strong>.
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Euclidean distance" · "Cost distance" · "Viewshed" · "Distance from every cell to nearest feature" → all <strong>Global</strong>. Distance and visibility calculations that need whole-raster context = Global.
+    </div>
+  </div>
+
+  <!-- Quick Reference Table -->
+  <div style="margin-bottom:2.5rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--rule);">Quick Reference</div>
+    <table>
+      <thead>
+        <tr><th>Operation</th><th>How many cells used</th><th>Beer example</th><th>Exam triggers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">Local</td><td>Matching cell(s) across rasters</td><td>Nitrogen × moisture = growth potential</td><td>Multiply, add, subtract rasters · reclassify · change detection</td></tr>
+        <tr><td class="mono">Focal</td><td>Cell + surrounding neighborhood</td><td>Smooth elevation for slope planning</td><td>Slope · aspect · smoothing filter · 3×3 window · moving window</td></tr>
+        <tr><td class="mono">Zonal</td><td>All cells within each zone/polygon</td><td>Avg moisture per hop variety zone</td><td>"Per polygon" · "per watershed" · "within each ___"</td></tr>
+        <tr><td class="mono">Global</td><td>All cells in entire raster</td><td>Distance to nearest brewery</td><td>Euclidean distance · cost distance · viewshed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="../index.html">← Back to Beer &amp; GIS</a>
+    <a href="overlay-ops.html">Overlay Operations →</a>
+  </div>
+
+</div>
+
+<footer>
+  <span><a href="../index.html">Beer &amp; GIS</a> · Brooks Groves</span>
+  <span><a href="https://brooksgroves.com">brooksgroves.com</a></span>
+</footer>
+
+</body>
+</html>

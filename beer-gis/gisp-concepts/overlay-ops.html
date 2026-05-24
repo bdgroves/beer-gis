@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overlay Operations — Beer & GIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1814;--paper:#f5f1e8;--rust:#8b3a1f;--gold:#b8860b;--slate:#3d4a5c;--muted:#7a7060;--rule:#d4c9b0; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);}
+  nav{border-bottom:1px solid var(--rule);padding:.85rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  nav a{color:var(--rust);text-decoration:none;}
+  nav a:hover{text-decoration:underline;}
+  .hero{border-bottom:1px solid var(--rule);padding:3rem 2rem 2.5rem;background:linear-gradient(180deg,#ede8db 0%,var(--paper) 100%);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--rust);margin-bottom:.75rem;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.75rem;}
+  .hero-sub{font-size:1rem;color:var(--muted);max-width:600px;line-height:1.7;font-weight:300;}
+  .container{max-width:820px;margin:0 auto;padding:3rem 2rem;}
+  .concept{margin-bottom:3.5rem;border-left:4px solid var(--rust);padding-left:1.5rem;}
+  .concept-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rust);margin-bottom:.4rem;}
+  .concept h2{font-family:'Playfair Display',serif;font-size:1.75rem;margin-bottom:.75rem;}
+  .concept p{font-size:14.5px;line-height:1.75;color:var(--ink);margin-bottom:.85rem;font-weight:300;}
+  .beer-callout{background:#fff8e8;border:1px solid #e8d890;border-left:4px solid var(--gold);padding:1rem 1.25rem;margin:1rem 0;border-radius:0 6px 6px 0;font-size:14px;line-height:1.65;}
+  .beer-callout-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:4px;}
+  .exam-tip{background:#fdf0e4;border-left:4px solid var(--rust);padding:.85rem 1.1rem;margin:1rem 0;font-size:13.5px;line-height:1.65;border-radius:0 4px 4px 0;}
+  .exam-tip-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rust);margin-bottom:4px;}
+
+  /* Overlay diagrams */
+  .overlay-diagram{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.25rem 0;align-items:center;}
+  .diagram-box{background:white;border:1px solid var(--rule);border-radius:6px;padding:.85rem;text-align:center;}
+  .diagram-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;}
+  .diagram-svg{width:80px;height:60px;margin:0 auto 6px;}
+  .diagram-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+  .diagram-op{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--muted);}
+
+  /* Rule box */
+  .rule-box{background:#fcebeb;border-left:4px solid var(--rust);padding:.85rem 1.1rem;margin:1rem 0;font-size:14px;line-height:1.65;border-radius:0 4px 4px 0;}
+  .rule-box-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rust);margin-bottom:4px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:1rem 0;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--rule);text-align:left;background:#faf8f3;}
+  td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:#faf8f3;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--slate);font-weight:500;}
+  .page-nav{display:flex;justify-content:space-between;padding-top:2rem;border-top:1px solid var(--rule);margin-top:2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .page-nav a{color:var(--rust);text-decoration:none;}
+  footer{border-top:1px solid var(--rule);padding:1.25rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+  footer a{color:var(--rust);text-decoration:none;}
+  @media(max-width:560px){.overlay-diagram{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">← Beer &amp; GIS</a> &nbsp;/&nbsp; GIS Concepts &nbsp;/&nbsp; Overlay Operations</nav>
+
+<div class="hero">
+  <div class="eyebrow">🔀 Vector Analysis · GIS Concepts</div>
+  <h1>Overlay Operations</h1>
+  <p class="hero-sub">Union, Intersect, Clip, and Erase — finding the perfect taproom location using zoning layers, school buffers, and neighborhood boundaries.</p>
+</div>
+
+<div class="container">
+
+  <!-- THE SCENARIO -->
+  <div style="background:white;border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin-bottom:2.5rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rust);margin-bottom:.5rem;">🍺 The Scenario</div>
+    <p style="font-size:14.5px;line-height:1.7;font-weight:300;color:var(--ink);">You're a GIS consultant helping a client site a new craft brewery taproom in Seattle. You have four spatial layers: <strong>zoning districts</strong>, <strong>neighborhood boundaries</strong>, <strong>school locations</strong>, and <strong>available parcels</strong>. Each overlay operation answers a different question about where the taproom can go.</p>
+  </div>
+
+  <!-- UNION -->
+  <div class="concept">
+    <div class="concept-tag">Operation 01</div>
+    <h2>Union</h2>
+    <p>Union combines all features from both input layers into a single output. The full geographic extent of both inputs is preserved. Attributes from both layers are included in every output feature.</p>
+    <p>Think of Union as adding two datasets together — you get everything from A, everything from B, and where they overlap you get features with attributes from both.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Taproom Example</div>
+      You want a single map layer showing both <strong>zoning districts AND neighborhood boundaries</strong> for the whole city. Union gives you the complete picture — every parcel now has both its zoning classification and its neighborhood name. No data is discarded.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "All features from both" · "Combine two layers" · "Full extent of both" · "Merge" → <strong>Union</strong>
+    </div>
+  </div>
+
+  <!-- INTERSECT -->
+  <div class="concept">
+    <div class="concept-tag">Operation 02</div>
+    <h2>Intersect</h2>
+    <p>Intersect returns only the areas where both input layers spatially overlap. Anything outside the overlap is discarded. Attributes from both layers are preserved in the output — but only for the overlapping areas.</p>
+    <p>The AND condition: a feature must satisfy both inputs simultaneously to appear in the output. This makes Intersect the go-to operation for "within" and "inside" queries.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Taproom Example</div>
+      Your client wants parcels that are zoned commercial AND located within the Ballard neighborhood. Intersect returns only the parcels where both conditions are spatially true — commercial zoning overlapping the Ballard boundary. Everything else is discarded.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Within" · "Inside" · "Overlap" · "AND condition — both must be true" → <strong>Intersect</strong>
+    </div>
+  </div>
+
+  <!-- CLIP -->
+  <div class="concept">
+    <div class="concept-tag">Operation 03</div>
+    <h2>Clip</h2>
+    <p>Clip uses one layer as a cookie cutter on another. The output has the shape of the clip boundary, containing only the features from the input layer — with only the input layer's attributes. The clip layer is just the cutting shape, its attributes are not transferred.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Taproom Example</div>
+      You have a statewide roads layer but only need streets within King County for your delivery route planning. Clip uses the King County boundary as the cookie cutter — roads are cut to that shape, only the roads layer's attributes remain.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Cut to the boundary of" · "Extract features within study area" · "Cookie cutter" → <strong>Clip</strong>
+    </div>
+  </div>
+
+  <!-- ERASE -->
+  <div class="concept">
+    <div class="concept-tag">Operation 04</div>
+    <h2>Erase</h2>
+    <p>Erase removes the area of one layer from another. The output is the first layer (A) with the second layer's (B) area punched out of it. Use Erase when you want what is OUTSIDE a zone.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Taproom Example</div>
+      Washington State liquor licensing requires taprooms to be more than 500 feet from schools. Buffer all schools by 500 feet, then Erase that buffer from the available parcels layer. What remains are parcels that are safely outside the school exclusion zones.
+    </div>
+    <div class="rule-box">
+      <div class="rule-box-label">⚠️ The Direction Rule — Never Miss This</div>
+      Want what's <strong>INSIDE</strong> a zone → Buffer → <strong>INTERSECT</strong><br>
+      Want what's <strong>OUTSIDE</strong> a zone → Buffer → <strong>ERASE</strong><br><br>
+      "Taprooms within 1 mile of downtown" → Buffer + Intersect<br>
+      "Taprooms more than 500ft from schools" → Buffer + Erase
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Trigger</div>
+      "Outside" · "Beyond" · "More than X distance away" · "Exclude" · "Remove" → <strong>Erase</strong>
+    </div>
+  </div>
+
+  <!-- Quick Reference -->
+  <div style="margin-bottom:2rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule);">Quick Reference</div>
+    <table>
+      <thead><tr><th>Operation</th><th>Output</th><th>Attributes</th><th>Trigger words</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Union</td><td>Everything from A + B, full extent</td><td>Both layers</td><td>"all features," "combine," "merge"</td></tr>
+        <tr><td class="mono">Intersect</td><td>Only where A and B overlap</td><td>Both layers</td><td>"within," "inside," "AND condition"</td></tr>
+        <tr><td class="mono">Clip</td><td>A cut to B's shape</td><td>A only</td><td>"cut to boundary," "study area"</td></tr>
+        <tr><td class="mono">Erase</td><td>A minus B's area</td><td>A only</td><td>"outside," "beyond," "exclude"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="raster-ops.html">← Raster Operations</a>
+    <a href="classification.html">Classification Methods →</a>
+  </div>
+</div>
+
+<footer>
+  <span><a href="../index.html">Beer &amp; GIS</a> · Brooks Groves</span>
+  <span><a href="https://brooksgroves.com">brooksgroves.com</a></span>
+</footer>
+</body>
+</html>

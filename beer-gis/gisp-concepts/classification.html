@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classification Methods — Beer & GIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1814;--paper:#f5f1e8;--rust:#8b3a1f;--gold:#b8860b;--slate:#3d4a5c;--muted:#7a7060;--rule:#d4c9b0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);}
+  nav{border-bottom:1px solid var(--rule);padding:.85rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  nav a{color:var(--rust);text-decoration:none;}
+  .hero{border-bottom:1px solid var(--rule);padding:3rem 2rem 2.5rem;background:linear-gradient(180deg,#ede8db 0%,var(--paper) 100%);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--rust);margin-bottom:.75rem;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.75rem;}
+  .hero-sub{font-size:1rem;color:var(--muted);max-width:600px;line-height:1.7;font-weight:300;}
+  .container{max-width:820px;margin:0 auto;padding:3rem 2rem;}
+  .concept{margin-bottom:3.5rem;border-left:4px solid var(--rust);padding-left:1.5rem;}
+  .concept-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rust);margin-bottom:.4rem;}
+  .concept h2{font-family:'Playfair Display',serif;font-size:1.75rem;margin-bottom:.75rem;}
+  .concept p{font-size:14.5px;line-height:1.75;color:var(--ink);margin-bottom:.85rem;font-weight:300;}
+  .beer-callout{background:#fff8e8;border:1px solid #e8d890;border-left:4px solid var(--gold);padding:1rem 1.25rem;margin:1rem 0;border-radius:0 6px 6px 0;font-size:14px;line-height:1.65;}
+  .beer-callout-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:4px;}
+  .exam-tip{background:#fdf0e4;border-left:4px solid var(--rust);padding:.85rem 1.1rem;margin:1rem 0;font-size:13.5px;line-height:1.65;border-radius:0 4px 4px 0;}
+  .exam-tip-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rust);margin-bottom:4px;}
+  .warn-box{background:#fcebeb;border-left:4px solid var(--rust);padding:.85rem 1.1rem;margin:1rem 0;font-size:13.5px;line-height:1.65;border-radius:0 4px 4px 0;}
+  .warn-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--rust);margin-bottom:4px;}
+
+  /* Bar chart visualization */
+  .bar-chart{margin:1.25rem 0;}
+  .bar-chart-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px;}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .bar-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);width:36px;text-align:right;}
+  .bar{height:20px;border-radius:2px;transition:width .3s;}
+  .bar-break{width:2px;height:24px;background:var(--rust);opacity:.6;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:1rem 0;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--rule);text-align:left;background:#faf8f3;}
+  td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5;}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:#faf8f3;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--slate);font-weight:500;}
+  .page-nav{display:flex;justify-content:space-between;padding-top:2rem;border-top:1px solid var(--rule);margin-top:2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .page-nav a{color:var(--rust);text-decoration:none;}
+  footer{border-top:1px solid var(--rule);padding:1.25rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+  footer a{color:var(--rust);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">← Beer &amp; GIS</a> &nbsp;/&nbsp; GIS Concepts &nbsp;/&nbsp; Classification Methods</nav>
+
+<div class="hero">
+  <div class="eyebrow">📊 Cartography · GIS Concepts</div>
+  <h1>Classification Methods</h1>
+  <p class="hero-sub">Natural Breaks, Quantile, Equal Interval, and Standard Deviation — mapping brewery ratings across Washington State to understand which method reveals which patterns.</p>
+</div>
+
+<div class="container">
+
+  <div style="background:white;border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin-bottom:2.5rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--rust);margin-bottom:.5rem;">🍺 The Dataset</div>
+    <p style="font-size:14.5px;line-height:1.7;font-weight:300;">You have Untappd ratings for 400 Washington State craft breweries, ranging from 3.2 to 4.9. The distribution is right-skewed — most breweries cluster between 3.8–4.3, with a handful of exceptional breweries scoring 4.7–4.9. The classification method you choose will dramatically change what the map communicates.</p>
+  </div>
+
+  <!-- NATURAL BREAKS -->
+  <div class="concept">
+    <div class="concept-tag">Method 01</div>
+    <h2>Natural Breaks (Jenks)</h2>
+    <p>Natural Breaks places class boundaries where the data has its largest jumps — minimizing differences within classes and maximizing differences between classes. The algorithm (Jenks optimization) finds the natural clusters in the data distribution.</p>
+    <p>It adapts to the actual data, which makes it excellent for revealing real patterns in unevenly distributed or skewed datasets.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Rating Example</div>
+      With our right-skewed brewery rating data, Natural Breaks finds the real gap between the large cluster of good breweries (3.8–4.3) and the handful of exceptional ones (4.7–4.9). The class boundary falls exactly where the data jumps — cleanly separating the exceptional breweries from the rest.
+    </div>
+    <div class="warn-box">
+      <div class="warn-label">⚠️ Key Weakness</div>
+      Natural Breaks recalculates from each dataset independently. If you make a map of brewery ratings in 2023 and another in 2024, the class breaks will be different — making direct year-over-year comparison meaningless. Never use Natural Breaks for a map series.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Natural gaps in data" · "Natural clusters" · "Skewed data" · "Outliers" · "Show true magnitude differences" · "Best represents the distribution" → <strong>Natural Breaks</strong>
+    </div>
+  </div>
+
+  <!-- QUANTILE -->
+  <div class="concept">
+    <div class="concept-tag">Method 02</div>
+    <h2>Quantile</h2>
+    <p>Quantile puts exactly the same number of features in each class by adjusting the class break values to accommodate the data distribution. With 400 breweries and 5 classes, each class gets exactly 80 breweries.</p>
+    <p>The result is a visually balanced map — no class appears empty or overloaded. But this visual balance comes at the cost of statistical accuracy.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Rating Example</div>
+      Quantile forces 80 breweries into each class regardless of their actual rating spread. A brewery rated 4.2 might end up in the same "high" class as one rated 4.9, just to balance the count. The map looks visually balanced but makes the 4.2 and 4.9 breweries appear equivalent — misleading for anyone trying to find the truly exceptional ones.
+    </div>
+    <div class="warn-box">
+      <div class="warn-label">⚠️ Key Weakness — Most Misleading for True Differences</div>
+      Quantile groups unlike values together to balance counts. It's the most misleading method when the goal is showing true magnitude differences between features. A brewery rated 3.9 and one rated 4.8 could end up the same color.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Same number of features per class" · "Equal number of breweries in each class" · "Visually balanced map" · "Relative rank" → <strong>Quantile</strong>
+    </div>
+  </div>
+
+  <!-- EQUAL INTERVAL -->
+  <div class="concept">
+    <div class="concept-tag">Method 03</div>
+    <h2>Equal Interval</h2>
+    <p>Equal Interval divides the data range into classes of equal width. With ratings from 3.2 to 4.9 and 5 classes, each class covers exactly 0.34 rating points: 3.2–3.54, 3.54–3.88, and so on.</p>
+    <p>It works well when data is uniformly distributed. With skewed data it creates empty classes — most breweries pile into a couple of classes while others sit empty.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Rating Series Example</div>
+      You're mapping average brewery ratings per county for 2020, 2021, 2022, and 2023. You need viewers to compare maps year over year — so dark amber must mean the same rating range on all four maps. Equal Interval with fixed predetermined breaks is the only method that guarantees this consistency. Set the breaks once, apply to all four maps.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Map series" · "Year-over-year comparison" · "Same class breaks across maps" · "Uniform distribution" → <strong>Equal Interval (fixed breaks)</strong>
+    </div>
+  </div>
+
+  <!-- STD DEVIATION -->
+  <div class="concept">
+    <div class="concept-tag">Method 04</div>
+    <h2>Standard Deviation</h2>
+    <p>Standard Deviation groups features by how many standard deviations they fall above or below the mean. Class breaks are set at intervals of ½ or 1 standard deviation from the mean — making it immediately clear which features perform significantly above or below average.</p>
+    <p>Works best with normally distributed data. Pair with a diverging color scheme for maximum visual impact.</p>
+    <div class="beer-callout">
+      <div class="beer-callout-label">🍺 Brewery Rating Example</div>
+      The state average brewery rating is 4.1. Using Standard Deviation classification, you can immediately see which counties have breweries performing more than one standard deviation above average (exceptional brewing regions) or below average (underperforming areas). Pair with a diverging color scheme: deep amber for above average, neutral for average, grey for below.
+    </div>
+    <div class="exam-tip">
+      <div class="exam-tip-label">Exam Triggers</div>
+      "Above/below average" · "Deviation from mean" · "More than one standard deviation" · "Normally distributed" → <strong>Standard Deviation + Diverging color scheme</strong>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <div style="margin-bottom:2rem;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule);">Quick Reference</div>
+    <table>
+      <thead><tr><th>Method</th><th>What's equal</th><th>Best for</th><th>Key weakness</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Natural Breaks</td><td>Minimized within-class variance</td><td>Skewed data, natural clusters, true differences</td><td>NOT comparable across maps</td></tr>
+        <tr><td class="mono">Quantile</td><td>Features per class</td><td>Relative rank, visually balanced maps</td><td>Groups unlike values together</td></tr>
+        <tr><td class="mono">Equal Interval</td><td>Class value ranges</td><td>Uniform data, map series comparison</td><td>Empty classes with skewed data</td></tr>
+        <tr><td class="mono">Std Deviation</td><td>Distance from mean</td><td>Above/below average analysis</td><td>Misleading with non-normal data</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-nav">
+    <a href="overlay-ops.html">← Overlay Operations</a>
+    <a href="data-quality.html">Data Quality →</a>
+  </div>
+</div>
+
+<footer>
+  <span><a href="../index.html">Beer &amp; GIS</a> · Brooks Groves</span>
+  <span><a href="https://brooksgroves.com">brooksgroves.com</a></span>
+</footer>
+</body>
+</html>

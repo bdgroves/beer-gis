@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNW Brewery Atlas — Beer & GIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1814;--paper:#f5f1e8;--rust:#8b3a1f;--gold:#b8860b;--slate:#3d4a5c;--muted:#7a7060;--rule:#d4c9b0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);}
+  nav{border-bottom:1px solid var(--rule);padding:.85rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  nav a{color:var(--rust);text-decoration:none;}
+  .hero{border-bottom:1px solid var(--rule);padding:4rem 2rem 3rem;background:linear-gradient(180deg,#ede8db 0%,var(--paper) 100%);text-align:center;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--rust);margin-bottom:.75rem;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.8rem);margin-bottom:.75rem;line-height:1.1;}
+  .hero h1 em{font-style:italic;color:var(--rust);}
+  .hero-sub{font-size:1rem;color:var(--muted);max-width:580px;margin:0 auto 2rem;line-height:1.7;font-weight:300;}
+  .tag-row{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:4px 10px;border:1px solid var(--rule);border-radius:3px;color:var(--slate);background:white;}
+  .container{max-width:820px;margin:0 auto;padding:3rem 2rem;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule);}
+  .analysis-card{background:white;border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin-bottom:1.25rem;border-left:4px solid var(--rust);}
+  .analysis-card h3{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:.5rem;}
+  .analysis-card p{font-size:14px;line-height:1.7;color:var(--muted);font-weight:300;margin-bottom:.75rem;}
+  .method-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .method-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;background:#f5f1e8;border:1px solid var(--rule);border-radius:2px;color:var(--slate);}
+  .coming-soon{opacity:.6;}
+  .status{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rust);margin-bottom:.4rem;}
+  .data-section{background:#faf8f3;border:1px solid var(--rule);border-radius:8px;padding:1.25rem;margin:2rem 0;}
+  .data-section h3{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink);margin-bottom:.75rem;}
+  .data-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--rule);font-size:13.5px;}
+  .data-row:last-child{border-bottom:none;}
+  .data-source{color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  .page-nav{display:flex;justify-content:space-between;padding-top:2rem;border-top:1px solid var(--rule);margin-top:2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .page-nav a{color:var(--rust);text-decoration:none;}
+  footer{border-top:1px solid var(--rule);padding:1.25rem 2rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+  footer a{color:var(--rust);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav><a href="../index.html">← Beer &amp; GIS</a> &nbsp;/&nbsp; Pacific Northwest Brewery Atlas</nav>
+
+<div class="hero">
+  <div class="eyebrow">🍺 Full Analysis Project</div>
+  <h1>Pacific Northwest<br><em>Brewery Atlas</em></h1>
+  <p class="hero-sub">A full geospatial analysis of the PNW craft brewing landscape — spatial distribution, clustering, proximity to hop-growing regions, drive-time catchments, and choropleth mapping of brewery density.</p>
+  <div class="tag-row">
+    <span class="tag">Python · GeoPandas</span>
+    <span class="tag">Kernel Density Estimation</span>
+    <span class="tag">Drive-time Analysis</span>
+    <span class="tag">Choropleth Mapping</span>
+    <span class="tag">Spatial Join</span>
+    <span class="tag">OpenStreetMap Data</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section-label">Analysis Modules</div>
+
+  <div class="analysis-card">
+    <div class="status">Module 01 — Coming Soon</div>
+    <h3>Spatial Distribution & Density</h3>
+    <p>Where are PNW breweries concentrated? Kernel Density Estimation reveals hotspots across Washington, Oregon, and Idaho. Choropleth maps show brewery density per 100,000 residents by county — normalized for fair comparison.</p>
+    <div class="method-tags">
+      <span class="method-tag">KDE</span>
+      <span class="method-tag">Choropleth</span>
+      <span class="method-tag">Normalization</span>
+      <span class="method-tag">Sequential color scheme</span>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="status">Module 02 — Coming Soon</div>
+    <h3>Proximity to Hop Growing Regions</h3>
+    <p>The Yakima Valley produces ~75% of US hops. How far are PNW breweries from their raw ingredients? Euclidean distance and drive-time analysis reveal which breweries have the freshest access to hops.</p>
+    <div class="method-tags">
+      <span class="method-tag">Euclidean Distance (Global raster)</span>
+      <span class="method-tag">Buffer Analysis</span>
+      <span class="method-tag">Spatial Join</span>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="status">Module 03 — Coming Soon</div>
+    <h3>Taproom Siting Analysis</h3>
+    <p>Finding the optimal new taproom location using overlay operations — commercial zoning, school exclusion buffers, population density, and competitor proximity. A real-world application of Union, Intersect, and Erase.</p>
+    <div class="method-tags">
+      <span class="method-tag">Buffer + Erase</span>
+      <span class="method-tag">Buffer + Intersect</span>
+      <span class="method-tag">Overlay Analysis</span>
+      <span class="method-tag">Cost Path</span>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="status">Module 04 — Coming Soon</div>
+    <h3>Rating Geography</h3>
+    <p>Do certain regions produce consistently higher-rated beer? Mapping average Untappd ratings by county using Natural Breaks, Quantile, and Standard Deviation — showing how classification method choice changes the story the map tells.</p>
+    <div class="method-tags">
+      <span class="method-tag">Natural Breaks</span>
+      <span class="method-tag">Quantile</span>
+      <span class="method-tag">Standard Deviation</span>
+      <span class="method-tag">Diverging color scheme</span>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="status">Module 05 — Coming Soon</div>
+    <h3>Delivery Route Optimization</h3>
+    <p>Network analysis for brewery distribution — least-cost path routing, drive-time catchment areas, and road network topology. How far can a freshness-focused brewery realistically distribute?</p>
+    <div class="method-tags">
+      <span class="method-tag">Network Analysis</span>
+      <span class="method-tag">Cost Distance</span>
+      <span class="method-tag">Drive-time Polygons</span>
+      <span class="method-tag">Topology</span>
+    </div>
+  </div>
+
+  <!-- Data sources -->
+  <div class="data-section">
+    <h3>Data Sources</h3>
+    <div class="data-row">
+      <span>Brewery locations &amp; attributes</span>
+      <span class="data-source">OpenStreetMap · Brewers Association</span>
+    </div>
+    <div class="data-row">
+      <span>Hop growing regions</span>
+      <span class="data-source">USDA National Agricultural Statistics</span>
+    </div>
+    <div class="data-row">
+      <span>County boundaries</span>
+      <span class="data-source">US Census Bureau TIGER/Line</span>
+    </div>
+    <div class="data-row">
+      <span>Road network</span>
+      <span class="data-source">OpenStreetMap via OSMnx</span>
+    </div>
+    <div class="data-row">
+      <span>Population data</span>
+      <span class="data-source">US Census Bureau ACS 5-Year Estimates</span>
+    </div>
+    <div class="data-row">
+      <span>Zoning data</span>
+      <span class="data-source">City of Seattle Open Data Portal</span>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <a href="../index.html">← Back to Beer &amp; GIS</a>
+    <a href="../gisp-concepts/raster-ops.html">GIS Concepts →</a>
+  </div>
+</div>
+
+<footer>
+  <span><a href="../index.html">Beer &amp; GIS</a> · Brooks Groves</span>
+  <span><a href="https://brooksgroves.com">brooksgroves.com</a></span>
+</footer>
+</body>
+</html>
